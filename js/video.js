@@ -1,7 +1,7 @@
 (function() {
   $.fn.offer_vid = function() {
-    var prog
-      , run
+    var progress_tracker
+      , fn
       , controls
       , sprintf
       ;
@@ -21,10 +21,10 @@
     ';
 
 
-    prog = {
+    progress_tracker = {
       vid: null,
       indicator: null,
-      tmp: '<span class="max">%s</span> of <span class="value">%s</span>',
+      tmp: '<span class="max">%ss</span> of <span class="value">%ss</span>',
       prior_curr: null,
       update: function() {
         var max = Math.floor(this.vid.duration)
@@ -37,65 +37,65 @@
       }
     };
 
-    run = function(opt) {
-      var $offer = this        
-        , $hd = $(".hd", $offer)
-        , $bd = $(".bd", $offer)
-        , $stop
-        , vid = $("video", $offer).get(0)
-        , progress
-        , trans_on
-        , trans_off
-        ;
-      
-      // add string to be turned into control panel
-      $bd.append(controls);
-      $stop = $(".stop-vid", $offer)
-      progress = $(".vid-progress", $offer);
+    fn = function(opt) {
+      return this.each(function() {
+        var $offer = $(this)
+          , $hd = $(".hd", $offer)
+          , $bd = $(".bd", $offer)
+          , $stop
+          , vid = $("video", $offer).get(0)
+          , progress
+          , trans_on
+          , trans_off
+          , prog = $.extend({}, progress_tracker)
+          ;
+        
+        // render control panel
+        $bd.append(controls);
+        $stop = $(".stop-vid", $offer)
+        progress = $(".vid-progress", $offer);
 
-      prog.vid = vid;
-      prog.indicator = progress;
+        // setup progress tracker
+        prog.vid = vid;
+        prog.indicator = progress;
 
-      trans_on = function() {
-        $hd.fadeOut();
-        $bd.fadeIn(function() {
-          vid.play();
+        // show/hide display
+        trans_on = function() {
+          $bd.fadeIn(function() {
+            vid.play();
+          });
+        };
+        trans_off = function() {
+          $bd.fadeOut(function() {
+            vid.pause();
+            vid.currentTime=0;
+          });
+        };
+
+
+        // bind events
+        $hd.click(function() {
+          trans_on();
         });
-      };
-      trans_off = function() {
-        $bd.fadeOut(function() {
-          vid.pause();
-          vid.currentTime=0;
+        $stop.click(function() {
+          trans_off();
         });
-        $hd.fadeIn();
-      };
+        $(vid).bind("ended", function() {
+          $offer.addClass("done");
+          trans_off();
+        });
+        $(vid).bind("timeupdate", function() {
+          prog.update();
+        });
 
-
-      $hd.click(function() {
-        trans_on();
+        //shortcut past initial load
+        $(progress).click(function() {
+          vid.currentTime = 130;
+        });
       });
-
-      $stop.click(function() {
-        trans_off();
-      });
-
-      $(vid).bind("ended", function() {
-        $offer.addClass("done");
-        trans_off();
-      });
-
-      $(vid).bind("timeupdate", function() {
-        prog.update();
-      });
-
-      $(progress).click(function() {
-        vid.currentTime = 130;
-      });
-
-      return this;
     };
 
-    return run;
+    return fn;
   }();
 
   $(document).ready(function() {
