@@ -1,0 +1,32 @@
+.offer-vid .bd {
+  position: absolute;
+  top: 0;
+  display:none;
+}
+.offer-vid .hd {
+  border: 1px solid red;
+  border-radius: 5px;
+  position: absolute;
+  top: 0;
+  padding: 10px 20px;
+  margin: 3px;
+}
+.done .hd {
+  border: 1px solid green;
+}
+.offer-vid .custom-controls {
+  position: absolute;
+  top: 0px;
+  width: 100%;
+  color: #fff;
+  text-shadow: 0px 0px 3px #000;
+}
+.custom-controls .stop-vid {
+  font-family: sans-serif;
+  text-align: center;
+  float: right;
+  padding: 3px;
+}
+.custom-controls .vid-progress {
+  padding: 3px;
+}
